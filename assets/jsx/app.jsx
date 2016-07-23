@@ -1,23 +1,107 @@
 var Autoencoder = React.createClass({
   render: function(){
+    return( 
+      <div><br />
+        <table className="autoencoder">
+          <tr>
+            <td><h3>Visible Layer</h3></td>
+            <td>{"\u202f"}</td>
+            <td><h3>Hidden Layer</h3></td>
+            <td>{"\u202f"}</td>
+            <td><h3>Label Layer</h3></td>
+          </tr>
+          <tr>
+            <td><Unit /></td>
+            <td>{"\u202f"}</td>
+            <td><Unit /></td>
+            <td>{"\u202f"}</td>
+            <td><Unit /></td>
+          </tr>
+          <tr>
+            <td><Unit /></td>
+            <td>{"\u202f"}</td>
+            <td><Unit /></td>
+            <td>{"\u202f"}</td>
+            <td><Unit /></td>
+          </tr>
+          <tr>
+            <td><Unit /></td>
+            <td>{"\u202f"}</td>
+            <td>{"\u202f"}</td>
+            <td>{"\u202f"}</td>
+            <td><Unit /></td>
+          </tr>
+        </table>
+        <div>
+          <svg height="210" width="500">
+            <line x1={0} y1={0} x2={200} y2={200} className="line" />
+            Sorry, your browser does not support inline SVG.
+          </svg>
+        </div><br/>
+      </div>
+    );
+  },
+});
+var AE = React.createClass({
+  function vLayer(id_prefix, size){
+    var vl = [];
+    for(var c = 0; c < size; c++){
+      vl.push({id: id_prefix + c, });
+    }
+    return vl;
+  }
+  render: function(){
+    <Layer units={vLayer} />
+  }
+});
+var Layer = React.createClass({
+  render: function() {
+    var results = this.props.results;
+    console.log(results);
+    return (
+      <ol>
+        {units.map(function(unit) {
+          console.log(unit.id);
+          return <li key={unit.id}>{unit.}</li>;
+        })}
+      </ol>
+    );
+  }
+});
+var Unit = React.createClass({
+  getInitialState: function(){
+    return({
+      value: 0
+    });
+  },
+  render: function(){
     return(
-      <div>
-        Hello World
+      <div className="unit">
+        Unit: {this.state.value}
       </div>
     );
   }
 });
 var Settings = React.createClass({
+  getInitialState: function(){
+    return({
+      vUnits: 2,
+      hUnits: 2,
+      lUnits: 3,
+    });
+  },
   render: function(){
-    <table>
-      <tr>
-        <td>Visible units: <input type="text" value="2"></input></td>
-      </tr><tr>
-        <td>Hidden units: <input type="text" value="2"></input></td>
-      </tr><tr>
-        <td>Label units: <input type="text" value="3"></input></td>
-      </tr>
-    </table>
+    return(
+      <div>
+        <table>
+          <tr>
+            <td>Visible units: <input type="text" value={this.state.vUnits}></input></td>
+            <td>Hidden units: <input type="text" value={this.state.hUnits}></input></td>
+            <td>Label units: <input type="text" value={this.state.lUnits}></input></td>
+          </tr>
+        </table>
+      </div>
+    );
   }
 });
 var Graph = React.createClass({
@@ -57,18 +141,9 @@ var Graph = React.createClass({
     }
   }
 });
-var GraphObj = React.createClass({
-  render: function(){
-    return(
-      <div></div>
-    );
-  }
-});
 ReactDOM.render(
   <div>
-    Helloo0<br/>
-    <Graph/>
-    <Autoencoder />
+    <AE />
   </div>,
   document.getElementById('content')
 );
