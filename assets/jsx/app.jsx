@@ -6,8 +6,7 @@ var Autoencoder = React.createClass({
       lUnits: 2,
       lvis: 0,
       lhid: 0,
-      llab: 0,
-      units: []
+      llab: 0
     });
   },
   componentDidMount: function(){
@@ -23,12 +22,27 @@ var Autoencoder = React.createClass({
   },
   updateHid: function(){
     var sum = 0.;
-    // var weights = this.
-    console.log(sum);
-    for(var c = 0; c < this.state.lvis; c++){
-      sum += this.state.units[c];
+    var vunit = [], hunit = [], weight;
+    for(var c = 0; c < parseInt(this.state.lvis); c++){
+      vunit.push(document.getElementById("unit"+c));
     }
-    console.log(Math.tanh(sum));
+    for(var c = parseInt(this.state.lvis); c < parseInt(this.state.lvis)+parseInt(this.state.lhid); c++){
+      hunit.push(document.getElementById("unit"+c));
+    }
+    for(var c = 0; c < parseInt(this.state.lhid); c++){
+      weight = hunit[c].getAttribute("title").substring(9).split(",");
+      for(var c2 = 0; c2 < weight.length; c2 ++){
+        sum += parseInt(weight[c2]) * parseInt(vunit[c2].getAttribute("value"));
+        console.log("sum(hid="+c+",vis="+c2+"):"+sum);
+      }
+      if(sum >= Math.random() && hunit[c].getAttribute("value") == "0"){
+        hunit[c].click();
+        console.log(hunit[c]);
+      }else if(sum < Math.random() && hunit[c].getAttribute("value") == "1"){
+        hunit[c].click();
+      }
+    }
+    this.render();
   },
   setVUnits: function(event){ this.setState({vUnits: event.target.value}); },
   setHUnits: function(event){ this.setState({hUnits: event.target.value}); },
@@ -65,19 +79,19 @@ var Autoencoder = React.createClass({
           <tr>
             <td>Visible Layer: <br/><a onClick={this.updateHid} style={{color:'blue', border:'1px solid'}}><i>Propagate </i><img src="arrow.png" /></a></td>
             {vis.map(function(unit) {
-              return <Unit id={"unit"+unit.id} text={unit.text} key={unit.id}/>;
+              return <Unit value={"1"} id={"unit"+unit.id} text={unit.text} key={unit.id}/>;
             })}
           </tr>
           <tr>
             <td>Hidden Layer: </td>
             {hid.map(function(unit) {
-              return <Unit weights={genRange(0,lvis)} id={"unit"+unit.id} text={unit.text} key={unit.id}/>;
+              return <Unit weights={genRange(0,lvis)} value={"0"} id={"unit"+unit.id} text={unit.text} key={unit.id}/>;
             })}
           </tr>
           <tr>
             <td>Label Layer: </td>
             {lab.map(function(unit) {
-              return <Unit weights={genRange(lvis,lvis+lhid)} id={"unit"+unit.id} text={unit.text} key={unit.id}/>;
+              return <Unit weights={genRange(lvis,lvis+lhid)} value={"0"} id={"unit"+unit.id} text={unit.text} key={unit.id}/>;
             })}
           </tr>
         </table>
@@ -92,26 +106,20 @@ var Autoencoder = React.createClass({
 });
 var Unit = React.createClass({
   unitClicked: function(){
-    console.log(this.state.value);
-    if(this.state.value == 0)
-      this.state.value = 1;
+    if(this.props.value == 0)
+      this.props.value = 1;
     else
-       this.state.value = 0;
+       this.props.value = 0;
      this.forceUpdate();
-  },
-  getInitialState: function(){
-    return({
-      value: 1,
-    });
   },
   render: function(){
     var weights = [];
     if(this.props.weights != undefined) weights = this.props.weights;
     return(
-      <td onClick={this.unitClicked} title={"weights: "+weights} id={this.props.id} 
-          className={"unit"} style={{backgroundColor:'rgb(238,238,'+(255-255*this.state.value)+')',color:'black'}} key={this.props.key}>
+      <td onClick={this.unitClicked} title={"weights: "+weights} value={this.props.value} id={this.props.id} 
+          className={"unit"} style={{backgroundColor:'rgb(238,238,'+(255-255*this.props.value)+')',color:'black'}} key={this.props.key}>
         Unit: {this.props.text}<br/>
-        Value: {this.state.value}
+        Value: {this.props.value}
       </td>
     );
   }
