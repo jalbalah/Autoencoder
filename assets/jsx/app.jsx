@@ -1,115 +1,98 @@
 var Autoencoder = React.createClass({
-  render: function(){
-    return( 
-      <div><br />
-        <table className="autoencoder">
-          <tr>
-            <td><h3>Visible Layer</h3></td>
-            <td>{"\u202f"}</td>
-            <td><h3>Hidden Layer</h3></td>
-            <td>{"\u202f"}</td>
-            <td><h3>Label Layer</h3></td>
-          </tr>
-          <tr>
-            <td><Unit /></td>
-            <td>{"\u202f"}</td>
-            <td><Unit /></td>
-            <td>{"\u202f"}</td>
-            <td><Unit /></td>
-          </tr>
-          <tr>
-            <td><Unit /></td>
-            <td>{"\u202f"}</td>
-            <td><Unit /></td>
-            <td>{"\u202f"}</td>
-            <td><Unit /></td>
-          </tr>
-          <tr>
-            <td><Unit /></td>
-            <td>{"\u202f"}</td>
-            <td>{"\u202f"}</td>
-            <td>{"\u202f"}</td>
-            <td><Unit /></td>
-          </tr>
-        </table>
-        <div>
-          <svg height="210" width="500">
-            <line x1={0} y1={0} x2={200} y2={200} className="line" />
-            Sorry, your browser does not support inline SVG.
-          </svg>
-        </div><br/>
-      </div>
-    );
-  },
-});
-var AE = React.createClass({
-  function vLayer(id_prefix, size){
-    var vl = [];
-    for(var c = 0; c < size; c++){
-      vl.push({id: id_prefix + c, });
-    }
-    return vl;
-  }
-  render: function(){
-    <Layer units={vLayer} />
-  }
-});
-var Layer = React.createClass({
-  render: function() {
-    var results = this.props.results;
-    console.log(results);
-    return (
-      <ol>
-        {units.map(function(unit) {
-          console.log(unit.id);
-          return <li key={unit.id}>{unit.}</li>;
-        })}
-      </ol>
-    );
-  }
-});
-var Unit = React.createClass({
-  getInitialState: function(){
-    return({
-      value: 0
-    });
-  },
-  render: function(){
-    return(
-      <div className="unit">
-        Unit: {this.state.value}
-      </div>
-    );
-  }
-});
-var Settings = React.createClass({
   getInitialState: function(){
     return({
       vUnits: 2,
-      hUnits: 2,
-      lUnits: 3,
+      hUnits: 3,
+      lUnits: 2,
     });
   },
+  setVUnits: function(event){ this.setState({vUnits: event.target.value}); },
+  setHUnits: function(event){ this.setState({hUnits: event.target.value}); },
+  setLUnits: function(event){ this.setState({lUnits: event.target.value}); },
+  updateHid: function(){
+
+  },
   render: function(){
+    var vis = [], hid = [], lab = [];
+    var c, max;
+    var lvis, lhid, llab; // lengths
+    var genRange = function(start, end){
+      var r = [];
+      for(var c=start;c<end;c++){
+        r.push([1.00]);
+        //r.push([c, 1.00]);
+      }
+      return r;
+    }
+    for(var c = 0; c < parseInt(this.state.vUnits); c++){ vis.push({id: c, text: c + 1}); }
+    for(c2 = c; c < c2 + parseInt(this.state.hUnits); c++){ hid.push({id: c, text: c + 1}); }
+    for(c2 = c; c < c2 + parseInt(this.state.lUnits); c++){ lab.push({id: c, text: c + 1}); }
+    lvis = vis.length; lhid = hid.length; llab = lab.length;
     return(
       <div>
         <table>
           <tr>
-            <td>Visible units: <input type="text" value={this.state.vUnits}></input></td>
-            <td>Hidden units: <input type="text" value={this.state.hUnits}></input></td>
-            <td>Label units: <input type="text" value={this.state.lUnits}></input></td>
+            <td>Visible units: <input value={this.state.vUnits} onChange={this.setVUnits} type="text"></input></td>
+            <td>Hidden units: <input value={this.state.hUnits} onChange={this.setHUnits} type="text"></input></td>
+            <td>Label units: <input value={this.state.lUnits} onChange={this.setLUnits} type="text"></input></td>
           </tr>
         </table>
+        <br/>
+        <table>
+          <tr>
+            <td>Visible Layer: <br/><div onClick={this.updateHid} style={{color:'blue', border:'1px solid'}}><i>Propagate </i><img src="arrow.png" /></div></td>
+            {vis.map(function(unit) {
+              return <Unit id={"unit"+unit.id} text={unit.text} key={unit.id}/>;
+            })}
+          </tr>
+          <tr>
+            <td>Hidden Layer: </td>
+            {hid.map(function(unit) {
+              return <Unit weights={genRange(0,lvis)} id={"unit"+unit.id} text={unit.text} key={unit.id}/>;
+            })}
+          </tr>
+          <tr>
+            <td>Label Layer: </td>
+            {lab.map(function(unit) {
+              return <Unit weights={genRange(lvis,lvis+lhid)} id={"unit"+unit.id} text={unit.text} key={unit.id}/>;
+            })}
+          </tr>
+        </table>
+        <svg height="210" width="500">
+          <line x1={0} y1={0} x2={200} y2={200} className="line" />
+          Sorry, browser does not support inline SVG.
+        </svg>
       </div>
+    );
+  },
+});
+var Unit = React.createClass({
+  unitClicked: function(){
+    console.log(this.state.value);
+    if(this.state.value == 0)
+      this.state.value = 1;//this.setState({value: 1});
+    else
+       this.state.value = 0;
+     this.forceUpdate();
+  },
+  getInitialState: function(){
+    return({
+      value: 1,
+    });
+  },
+  render: function(){
+    var weights = [];
+    if(this.props.weights != undefined) weights = this.props.weights;
+    return(
+      <td onClick={this.unitClicked} title={"weights: "+weights} id={this.props.id} 
+          className={"unit"} style={{backgroundColor:'rgb(238,238,'+(255-255*this.state.value)+')',color:'black'}} key={this.props.key}>
+        Unit: {this.props.text}<br/>
+        Value: {this.state.value}
+      </td>
     );
   }
 });
 var Graph = React.createClass({
-  getInitialState: function(){
-    return({
-      showCoord: true
-    });
-  },
   componentDidMount: function() {
     this.draw("x,y","(x,y):",[-20,-15,-15,-10,-5,0,5,10,15,20],[-40,-30,-20,-20,-10,0,10,20,30,40]);
   },
@@ -143,7 +126,7 @@ var Graph = React.createClass({
 });
 ReactDOM.render(
   <div>
-    <AE />
+    <Autoencoder />
   </div>,
   document.getElementById('content')
 );

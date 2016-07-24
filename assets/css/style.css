@@ -6,13 +6,9 @@
 	box-shadow: 0 0 5px rgba(0,0,0,0.5)
 }
 .unit{
-	border-style:solid;
-	padding:20px;
-	margin:10px;
-	margin-right:80px;
-}
-table.autoencoder td{
-	padding:30px;
+	border:2px solid;
+	border-color:black;
+	padding:2px;
 }
 .line{
 	stroke:rgb(255,0,0);

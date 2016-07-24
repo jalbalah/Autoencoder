@@ -1490,6 +1490,5 @@ td.visible-print,th.visible-print{display:table-cell!important}
 .hidden-print{display:none!important}
 }
 .nav-top{height:50px;background:#222;opacity:50%;box-shadow:0 0 5px rgba(0,0,0,.5)}
-.unit{border-style:solid;padding:20px;margin:10px 80px 10px 10px}
-table.autoencoder td{padding:30px}
+.unit{border:2px solid #000;padding:2px}
 .line{stroke:red;stroke-width:2}
