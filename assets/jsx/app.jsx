@@ -4,18 +4,44 @@ var Autoencoder = React.createClass({
       vUnits: 2,
       hUnits: 3,
       lUnits: 2,
+      lvis: 0,
+      lhid: 0,
+      llab: 0,
+      units: []
     });
+  },
+  componentDidMount: function(){
+    var vis = [], hid = [], lab = [];
+    var c, max;
+    var lvis, lhid, llab; // lengths
+    var units = [];
+    for(var c = 0; c < parseInt(this.state.vUnits); c++){ vis.push({id: c, text: c + 1}); }
+    for(c2 = c; c < c2 + parseInt(this.state.hUnits); c++){ hid.push({id: c, text: c + 1}); }
+    for(c2 = c; c < c2 + parseInt(this.state.lUnits); c++){ lab.push({id: c, text: c + 1}); }
+    lvis = vis.length; lhid = hid.length; llab = lab.length;
+    this.setState({lvis: vis.length, lhid: hid.length, llab: lab.length});
+  },
+  updateHid: function(){
+    var sum = 0.;
+    // var weights = this.
+    console.log(sum);
+    for(var c = 0; c < this.state.lvis; c++){
+      sum += this.state.units[c];
+    }
+    console.log(Math.tanh(sum));
   },
   setVUnits: function(event){ this.setState({vUnits: event.target.value}); },
   setHUnits: function(event){ this.setState({hUnits: event.target.value}); },
   setLUnits: function(event){ this.setState({lUnits: event.target.value}); },
-  updateHid: function(){
-
-  },
   render: function(){
     var vis = [], hid = [], lab = [];
     var c, max;
     var lvis, lhid, llab; // lengths
+    var units = [];
+    for(var c = 0; c < parseInt(this.state.vUnits); c++){ vis.push({id: c, text: c + 1}); }
+    for(c2 = c; c < c2 + parseInt(this.state.hUnits); c++){ hid.push({id: c, text: c + 1}); }
+    for(c2 = c; c < c2 + parseInt(this.state.lUnits); c++){ lab.push({id: c, text: c + 1}); }
+    lvis = vis.length; lhid = hid.length; llab = lab.length;
     var genRange = function(start, end){
       var r = [];
       for(var c=start;c<end;c++){
@@ -24,10 +50,6 @@ var Autoencoder = React.createClass({
       }
       return r;
     }
-    for(var c = 0; c < parseInt(this.state.vUnits); c++){ vis.push({id: c, text: c + 1}); }
-    for(c2 = c; c < c2 + parseInt(this.state.hUnits); c++){ hid.push({id: c, text: c + 1}); }
-    for(c2 = c; c < c2 + parseInt(this.state.lUnits); c++){ lab.push({id: c, text: c + 1}); }
-    lvis = vis.length; lhid = hid.length; llab = lab.length;
     return(
       <div>
         <table>
@@ -38,9 +60,10 @@ var Autoencoder = React.createClass({
           </tr>
         </table>
         <br/>
+        <div style={{backgroundColor: '#ddd'}}>
         <table>
           <tr>
-            <td>Visible Layer: <br/><div onClick={this.updateHid} style={{color:'blue', border:'1px solid'}}><i>Propagate </i><img src="arrow.png" /></div></td>
+            <td>Visible Layer: <br/><a onClick={this.updateHid} style={{color:'blue', border:'1px solid'}}><i>Propagate </i><img src="arrow.png" /></a></td>
             {vis.map(function(unit) {
               return <Unit id={"unit"+unit.id} text={unit.text} key={unit.id}/>;
             })}
@@ -58,6 +81,7 @@ var Autoencoder = React.createClass({
             })}
           </tr>
         </table>
+        </div>
         <svg height="210" width="500">
           <line x1={0} y1={0} x2={200} y2={200} className="line" />
           Sorry, browser does not support inline SVG.
@@ -70,7 +94,7 @@ var Unit = React.createClass({
   unitClicked: function(){
     console.log(this.state.value);
     if(this.state.value == 0)
-      this.state.value = 1;//this.setState({value: 1});
+      this.state.value = 1;
     else
        this.state.value = 0;
      this.forceUpdate();
