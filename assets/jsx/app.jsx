@@ -23,13 +23,14 @@ var Autoencoder = React.createClass({
   updateHid: function(){
     var sum = 0.;
     var vunit = [], hunit = [], weight;
-    for(var c = 0; c < parseInt(this.state.lvis); c++){
+    for(var c = 0; c < parseInt(this.state.vUnits); c++){
       vunit.push(document.getElementById("unit"+c));
     }
-    for(var c = parseInt(this.state.lvis); c < parseInt(this.state.lvis)+parseInt(this.state.lhid); c++){
+    for(var c = parseInt(this.state.vUnits); c < parseInt(this.state.vUnits)+parseInt(this.state.hUnits); c++){
       hunit.push(document.getElementById("unit"+c));
     }
-    for(var c = 0; c < parseInt(this.state.lhid); c++){
+    for(var c = 0; c < parseInt(this.state.hUnits); c++){
+      console.log("hunit["+c+"]: "+hunit[c]);
       weight = hunit[c].getAttribute("title").substring(9).split(",");
       for(var c2 = 0; c2 < weight.length; c2 ++){
         sum += parseInt(weight[c2]) * parseInt(vunit[c2].getAttribute("value"));
@@ -42,7 +43,6 @@ var Autoencoder = React.createClass({
         hunit[c].click();
       }
     }
-    this.render();
   },
   setVUnits: function(event){ this.setState({vUnits: event.target.value}); },
   setHUnits: function(event){ this.setState({hUnits: event.target.value}); },
