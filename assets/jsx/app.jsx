@@ -4,7 +4,7 @@ var Autoencoder = React.createClass({
       vUnits: 2,
       hUnits: 3,
       lUnits: 2,
-      lvis: 0,
+      lvis: 0,  // remove, bad option b/c setState not immediate
       lhid: 0,
       llab: 0
     });
@@ -22,12 +22,14 @@ var Autoencoder = React.createClass({
   updateHid: function(){
     var sum = 0.;
     var vunit = [], hunit = [], weight;
+    // find elems from html DOM (slow)
     for(var c = 0; c < parseInt(this.state.vUnits); c++){
       vunit.push(document.getElementById("unit"+c));
     }
     for(var c = parseInt(this.state.vUnits); c < parseInt(this.state.vUnits)+parseInt(this.state.hUnits); c++){
       hunit.push(document.getElementById("unit"+c));
     }
+    // main sum of w*x over units in input layer
     for(var c = 0; c < parseInt(this.state.hUnits); c++){
       console.log("hunit["+c+"]: "+hunit[c]);
       weight = hunit[c].getAttribute("title").substring(9).split(",");
@@ -106,25 +108,6 @@ var Autoencoder = React.createClass({
                 return <Unit weights={genRange(0, layer.sizeIn)} value={layer.value} id={"unit"+unit.id} text={unit.text}>{unit.text}</Unit>;
               })}</tr>);
           })}
-          <br/><br/>
-          <tr>
-            <td>{lay0.name}<br/><a onClick={lay0.clickFunc} style={lay0.style}><i>Propagate </i><img src="arrow.png" /></a></td>
-            {vis.map(function(unit) {
-              return <Unit value={lay0.value} id={"unit"+unit.id} text={unit.text} key={unit.id}/>;
-            })}
-          </tr>
-          <tr>
-            <td>Hidden Layer: </td>
-            {hid.map(function(unit) {
-              return <Unit weights={genRange(0,lvis)} value={"0"} id={"unit"+unit.id} text={unit.text} key={unit.id}/>;
-            })}
-          </tr>
-          <tr>
-            <td>Label Layer: </td>
-            {lab.map(function(unit) {
-              return <Unit weights={genRange(lvis,lvis+lhid)} value={"0"} id={"unit"+unit.id} text={unit.text} key={unit.id}/>;
-            })}
-          </tr>
         </table>
         </div>
         <svg height="210" width="500px">
