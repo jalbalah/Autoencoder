@@ -96,8 +96,8 @@ var Autoencoder = React.createClass({
           </tr>
         </table>
         </div>
-        <svg height="210" width="500">
-          <line x1={0} y1={0} x2={200} y2={200} className="line" />
+        <svg height="210" width="500px">
+          <line x1={0} y1={0} x2={500} y2={500} className="line" />
           Sorry, browser does not support inline SVG.
         </svg>
       </div>
