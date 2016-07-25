@@ -13,7 +13,6 @@ var Autoencoder = React.createClass({
     var vis = [], hid = [], lab = [];
     var c, max;
     var lvis, lhid, llab; // lengths
-    var units = [];
     for(var c = 0; c < parseInt(this.state.vUnits); c++){ vis.push({id: c, text: c + 1}); }
     for(c2 = c; c < c2 + parseInt(this.state.hUnits); c++){ hid.push({id: c, text: c + 1}); }
     for(c2 = c; c < c2 + parseInt(this.state.lUnits); c++){ lab.push({id: c, text: c + 1}); }
@@ -51,19 +50,35 @@ var Autoencoder = React.createClass({
     var vis = [], hid = [], lab = [];
     var c, max;
     var lvis, lhid, llab; // lengths
-    var units = [];
     for(var c = 0; c < parseInt(this.state.vUnits); c++){ vis.push({id: c, text: c + 1}); }
     for(c2 = c; c < c2 + parseInt(this.state.hUnits); c++){ hid.push({id: c, text: c + 1}); }
     for(c2 = c; c < c2 + parseInt(this.state.lUnits); c++){ lab.push({id: c, text: c + 1}); }
     lvis = vis.length; lhid = hid.length; llab = lab.length;
     var genRange = function(start, end){
       var r = [];
-      for(var c=start;c<end;c++){
-        r.push([1.00]);
-        //r.push([c, 1.00]);
-      }
+      for(var c=start;c<end;c++){ r.push([1.00]); } //r.push([c, 1.00]);
       return r;
     }
+    // Layer: @param, layer name, layer clickFunc, unit initialVal, num. units
+    var layer = function(name, clickFunc, value, size){
+      this.style = {color:'blue', border:'1px solid'};
+      this.name = name;
+      this.clickFunc = clickFunc;
+      this.value = value;
+      this.arr = [];
+      for(var c = 0; c < parseInt(size); c++){ this.arr.push({id: c, text: c + 1}); }
+      this.getLay = function(){
+        return({
+          style: this.style, name: this.name, clickFunc: this.clickFunc, 
+          value: this.value, arr: this.arr, text:"layyy", id: 0
+        });
+      }
+    };
+    var lay0 = new layer("Visible Layer: ", this.updateHid, "1", this.state.vUnits);
+    var lay = (new layer("Visible Layer: ", this.updateHid, "1", this.state.vUnits)).getLay();
+    console.log(lay0);
+    //var lay1 = new hlayer("Hidden Layer: ", this.updateLab, "0");
+    //var layers = [lay0];
     return(
       <div>
         <table>
@@ -76,10 +91,21 @@ var Autoencoder = React.createClass({
         <br/>
         <div style={{backgroundColor: '#ddd'}}>
         <table>
+          {[lay, {id: 1, text:"b" }].map(function(layer) {
+            return (<tr>
+              <td>{layer.name}<br/><a onClick={layer.clickFunc} style={layer.style}><i>Propagate </i><img src="arrow.png" /></a></td>
+              {[{id: 1, text: layer.text+"z"},{id: 1, text: layer.text}].map(function(unit) {
+                //return <Unit value={layer.value} id={"unit"+layer.id} text={layer.text} key={layer.id}>{unit.text}</Unit>;
+                return <Unit value={layer.value} id={"unit"+layer.id} text={layer.text}>{unit.text}</Unit>;
+                //return <Unit value={layer.value} id={"unit"+layer.id} text={layer.text} key={layer.id}/>;
+              })}
+            </tr>);
+          })}
+          <br/><br/>
           <tr>
-            <td>Visible Layer: <br/><a onClick={this.updateHid} style={{color:'blue', border:'1px solid'}}><i>Propagate </i><img src="arrow.png" /></a></td>
-            {vis.map(function(unit) {
-              return <Unit value={"1"} id={"unit"+unit.id} text={unit.text} key={unit.id}/>;
+            <td>{lay0.name}<br/><a onClick={lay0.clickFunc} style={lay0.style}><i>Propagate </i><img src="arrow.png" /></a></td>
+            {lay0.arr.map(function(unit) {
+              return <Unit value={lay0.value} id={"unit"+unit.id} text={unit.text} key={unit.id}/>;
             })}
           </tr>
           <tr>
