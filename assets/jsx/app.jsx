@@ -33,6 +33,8 @@ var Autoencoder = React.createClass({
       weight = hunit[c].getAttribute("title").substring(9).split(",");
       for(var c2 = 0; c2 < weight.length; c2 ++){
         sum += parseInt(weight[c2]) * parseInt(vunit[c2].getAttribute("value"));
+        console.log(weight[c2]);
+        console.log(vunit[c2].getAttribute("value"));
         console.log("sum(hid="+c+",vis="+c2+"):"+sum);
       }
       if(sum >= Math.random() && hunit[c].getAttribute("value") == "0"){
@@ -59,26 +61,31 @@ var Autoencoder = React.createClass({
       for(var c=start;c<end;c++){ r.push([1.00]); } //r.push([c, 1.00]);
       return r;
     }
-    // Layer: @param, layer name, layer clickFunc, unit initialVal, num. units
-    var layer = function(name, clickFunc, value, size){
+    // Layer: @param, layer name, layer clickFunc, unit initialVal, num. units, " in, 0/1/2==v/h/l
+    var layer = function(name, clickFunc, value, size, sizeIn, type){
       this.style = {color:'blue', border:'1px solid'};
-      this.name = name;
-      this.clickFunc = clickFunc;
-      this.value = value;
-      this.arr = [];
-      for(var c = 0; c < parseInt(size); c++){ this.arr.push({id: c, text: c + 1}); }
+      this.name = name; this.clickFunc = clickFunc; this.value = value; this.type = type;
+      this.arr = []; this.size = parseInt(size); this.sizeIn = parseInt(sizeIn); 
       this.getLay = function(){
         return({
-          style: this.style, name: this.name, clickFunc: this.clickFunc, 
-          value: this.value, arr: this.arr, text:"layyy", id: 0
+          name: this.name, clickFunc: this.clickFunc, style: this.style,
+          value: this.value, arr: this.arr, type: this.type,
+          size: this.size, sizeIn: this.sizeIn, id: 0
         });
       }
+      for(var c = NUM_UNITS; c < NUM_UNITS + parseInt(size); c++){ this.arr.push({id: c, text: c + 1}); }
+      console.log("this.arr"+this.arr.toString());
+      NUM_UNITS += parseInt(size);
     };
-    var lay0 = new layer("Visible Layer: ", this.updateHid, "1", this.state.vUnits);
-    var lay = (new layer("Visible Layer: ", this.updateHid, "1", this.state.vUnits)).getLay();
-    console.log(lay0);
-    //var lay1 = new hlayer("Hidden Layer: ", this.updateLab, "0");
-    //var layers = [lay0];
+    var lay0 = new layer("Visible Layer: ", this.updateHid, "1", this.state.vUnits); // remove soon
+    //console.log(lay0);
+    var NUM_UNITS = 0;
+    var lay1 = (new layer("Visible Layer: ", this.updateHid, "1", this.state.vUnits, 0, 0)).getLay();
+    console.log("NU:"+NUM_UNITS);
+    var lay2 = (new layer("Hidden Layer: ", this.updateHid, "0", this.state.hUnits, this.state.vUnits, 1)).getLay();
+    //console.log(NUM_UNITS);
+    var lay3 = (new layer("Label Layer: ", this.updateHid, "0", this.state.lUnits, this.state.hUnits, 2)).getLay();
+    var layers = [lay1, lay2, lay3];
     return(
       <div>
         <table>
@@ -91,20 +98,18 @@ var Autoencoder = React.createClass({
         <br/>
         <div style={{backgroundColor: '#ddd'}}>
         <table>
-          {[lay, {id: 1, text:"b" }].map(function(layer) {
+          {layers.map(function(layer) {
             return (<tr>
               <td>{layer.name}<br/><a onClick={layer.clickFunc} style={layer.style}><i>Propagate </i><img src="arrow.png" /></a></td>
-              {[{id: 1, text: layer.text+"z"},{id: 1, text: layer.text}].map(function(unit) {
+              {layer.arr.map(function(unit) { console.log("laySize:"+layer.size);//console.log(genRange(layer.sizeIn, layer.size));
                 //return <Unit value={layer.value} id={"unit"+layer.id} text={layer.text} key={layer.id}>{unit.text}</Unit>;
-                return <Unit value={layer.value} id={"unit"+layer.id} text={layer.text}>{unit.text}</Unit>;
-                //return <Unit value={layer.value} id={"unit"+layer.id} text={layer.text} key={layer.id}/>;
-              })}
-            </tr>);
+                return <Unit weights={genRange(0, layer.sizeIn)} value={layer.value} id={"unit"+unit.id} text={unit.text}>{unit.text}</Unit>;
+              })}</tr>);
           })}
           <br/><br/>
           <tr>
             <td>{lay0.name}<br/><a onClick={lay0.clickFunc} style={lay0.style}><i>Propagate </i><img src="arrow.png" /></a></td>
-            {lay0.arr.map(function(unit) {
+            {vis.map(function(unit) {
               return <Unit value={lay0.value} id={"unit"+unit.id} text={unit.text} key={unit.id}/>;
             })}
           </tr>
